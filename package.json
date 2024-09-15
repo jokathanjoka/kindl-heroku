@@ -1,0 +1,27 @@
+{
+  "name": "web-to-kindle-heroku",
+  "version": "0.1.0",
+  "description": "A service to create Kindle-ready web page screenshots",
+  "engines": {
+    "node": "12.x"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.15.2",
+    "canvas":  "^2.11.2",
+    "fs-extra": "^10.1.0",
+    "child_process": "^1.0.2",
+    "path": "^0.12.7",
+    "ejs":"^3.1.9",
+    "gifencoder":"^2.0.1",
+    "puppeteer": "^5.4.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lankybutmacho/web-to-kindle-heroku"
+  },
+  "license": "MIT"
+}
