@@ -8,11 +8,11 @@ let server = require(''),
 require('events').EventEmitter.defaultMaxListeners = 500;
 app.use('/wasiqr', server);
 app.use('/code', code);
-app.use('/pair',async (req, res, next) => {
-res.sendFile(__path + '/pair.html')
+app.use('/deploy.css',async (req, res, next) => {
+res.sendFile(__path + '/public/deploy.css')
 })
 app.use('/',async (req, res, next) => {
-res.sendFile(__path + '/wasipage.html')
+res.sendFile(__path + '/public/deploy.html')
 })
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
