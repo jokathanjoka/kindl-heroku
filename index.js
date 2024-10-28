@@ -1,40 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pocket movies- Categories</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <header>
-        <h1>Pocket movies</h1>
-        <nav>
-            <a href="index.html" class="nav-button"><span class="icon">🎬</span>Trending</a>
-            <a href="tv.html" class="nav-button"><span class="icon">📺</span>TV</a>
-            <a href="categories.html" class="nav-button"><span class="icon">📚</span>Categories</a>
-            <a href="live.html" class="nav-button"><span class="icon">🔴</span>Live</a>
-            <a href="action.html" class="nav-button"><span class="icon">💥</span>Action</a>
-        </nav>
-    </header>
-    
-    <main>
-        <h2>Categories</h2>
-        <div class="category-list">
-            <a href="https://moviepire.net" class="category">Action</a>
-            <a href="https://moviepire.net" class="category">Comedy</a>
-            <a href="https://moviepire.net" class="category">Crime</a>
-            <a href="https://moviepire.net" class="category">Drama</a>
-            <a href="https://moviepire.net" class="category">Horror</a>
-            <a href="https://moviepire.net" class="category">Romance</a>
-            <a href="https://moviepire.net" class="category">Sci-Fi</a>
-            <a href="https://moviepire.net" class="category">Thriller</a>
-            <!-- Add more categories as needed -->
-        </div>
-    </main>
 
-   
+const express = require('express');
+const path = require('path');
+const puppeteer = require('puppeteer');
+const execFile = require('child_process').execFile;
+const fs = require('fs');
 
-    <script src="scripts.js"></script>
-</body>
-</html>
+const PORT = process.env.PORT || 3000;
+
+express()
+  .use(express.static(path.join(__dirname, 'public')))
+  .set('views', path.join(__dirname, 'views'))
+  .set('view engine', 'ejs')
+  .get('/', async (req, res) => {
+    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+    const page = await browser.newPage();
+    await page.setViewport({ width: 600, height: 800 });
+    await page.goto(process.env.SCREENSHOT_URL || 'https://darksky.net/details/40.7127,-74.0059/2021-1-6/us12/en');
+    await page.screenshot({
+      path: '/tmp/screenshot.png',
+    });
+
+    await browser.close();
+
+    await convert('/tmp/screenshot.png');
+    screenshot = fs.readFileSync('/tmp/screenshot.png');
+
+    res.writeHead(200, {
+      'Content-Type': 'image/png',
+      'Content-Length': screenshot.length,
+    });
+    return res.end(screenshot);
+  })
+  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+
+function convert(filename) {
+  return new Promise((resolve, reject) => {
+    const args = [filename, '-gravity', 'center', '-extent', '600x800', '-colorspace', 'gray', '-depth', '8', filename];
+    execFile('convert', args, (error, stdout, stderr) => {
+      if (error) {
+        console.error({ error, stdout, stderr });
+        reject();
+      } else {
+        resolve();
+      }
+    });
+  });
+}
